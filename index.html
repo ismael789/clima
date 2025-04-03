@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Weather API</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Fondo degradado suave */
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Estilos del contenedor principal */
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        /* Input de la ciudad */
+        input {
+            padding: 1rem;
+            font-size: 1.1rem;
+            border: 2px solid #fff;
+            border-radius: 25px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 320px;
+            margin-right: 10px;
+            transition: 0.3s ease;
+        }
+
+        /* Efecto de enfoque en el input */
+        input:focus {
+            border-color: #ff7e5f;
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Botón de búsqueda */
+        button {
+            padding: 1rem 2rem;
+            background-color: #ff7e5f;
+            color: #fff;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Efecto hover sobre el botón */
+        button:hover {
+            background-color: #feb47b;
+            transform: translateY(-3px);
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Resultado del clima */
+        #resultado {
+            margin-top: 2rem;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 300px;
+            text-align: center;
+            font-size: 1.2rem;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s, transform 0.4s;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #ff7e5f;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            margin: 5px 0;
+        }
+
+        /* Animación de resultado */
+        #resultado.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Estilos para el loader */
+        #loading {
+            color: #ff7e5f;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Consulta el clima de tu ciudad</h1>
+    <input type="text" id="ciudad" placeholder="Ingresa una ciudad" />
+    <button id="buscar">Buscar Clima</button>
+
+    <div id="resultado"></div>
+    <div id="loading" style="display: none;">Cargando...</div>
+
+    <script>
+        document.getElementById("buscar").addEventListener("click", () => {
+            const ciudad = document.getElementById("ciudad").value;
+            const resultado = document.getElementById("resultado");
+            const loading = document.getElementById("loading");
+
+            if (ciudad) {
+                // Mostrar animación de carga
+                loading.style.display = "block";
+                resultado.classList.remove("show");
+                fetch(`http://localhost:3000/clima/${ciudad}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Ocultar animación de carga
+                        loading.style.display = "none";
+                        
+                        // Mostrar el resultado
+                        resultado.innerHTML = `
+                            <h2>Clima en ${data.name}, ${data.sys.country}</h2>
+                            <p>Temperatura: ${data.main.temp} °C</p>
+                            <p>Descripción: ${data.weather[0].description}</p>
+                        `;
+                        resultado.classList.add("show");
+                    })
+                    .catch(error => {
+                        loading.style.display = "none";
+                        resultado.innerHTML = "<p>Error al obtener el clima</p>";
+                        resultado.classList.add("show");
+                    });
+            } else {
+                alert("Por favor, ingresa una ciudad.");
+            }
+        });
+    </script>
+
+</body>
+</html>
